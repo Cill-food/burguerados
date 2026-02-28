@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Burguerados Paulista - Cardápio Digital</title>
+    <link rel="stylesheet" href="zap.css" />
+    <style>
+      /* =========================================
+         MODAL CONFIRMAÇÃO DE PEDIDO - WHATSAPP
+         ========================================= */
+      .modal-confirmacao {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: rgba(0, 0, 0, 0.88);
+        justify-content: center;
+        align-items: flex-end;
+        padding: 0;
+      }
+      .modal-confirmacao.active {
+        display: flex;
+      }
+      .modal-confirmacao-content {
+        background: #1a1a1a;
+        border-radius: 24px 24px 0 0;
+        width: 100%;
+        max-width: 540px;
+        max-height: 92vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.6);
+        animation: slideUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      @keyframes slideUp {
+        from {
+          transform: translateY(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+      .modal-confirmacao-header {
+        padding: 28px 24px 16px;
+        text-align: center;
+        border-bottom: 1px solid #2a2a2a;
+        flex-shrink: 0;
+      }
+      .confirmacao-icon {
+        font-size: 2.8rem;
+        margin-bottom: 8px;
+      }
+      .modal-confirmacao-header h2 {
+        color: #fff;
+        font-size: 1.4rem;
+        margin: 0 0 4px;
+      }
+      .confirmacao-subtitle {
+        color: #888;
+        font-size: 0.9rem;
+        margin: 0;
+      }
+      .confirmacao-preview {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px 24px;
+        background: #111;
+        margin: 16px;
+        border-radius: 14px;
+        border: 1px solid #2a2a2a;
+        font-family: "Courier New", monospace;
+        font-size: 0.82rem;
+        line-height: 1.6;
+        color: #ddd;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+      .confirmacao-actions {
+        padding: 16px 24px 28px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        flex-shrink: 0;
+        border-top: 1px solid #2a2a2a;
+      }
+      .btn-whatsapp-confirm {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        background: #25d366;
+        color: #fff;
+        font-size: 1.05rem;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        padding: 16px;
+        border-radius: 14px;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition:
+          background 0.2s,
+          transform 0.1s;
+        box-shadow: 0 4px 20px rgba(37, 211, 102, 0.35);
+      }
+      .btn-whatsapp-confirm:active {
+        transform: scale(0.97);
+        background: #1ebe5b;
+      }
+      .whatsapp-icon {
+        font-size: 1.3rem;
+      }
+      .btn-fechar-confirmacao {
+        background: transparent;
+        border: 1px solid #333;
+        color: #888;
+        padding: 12px;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition:
+          color 0.2s,
+          border-color 0.2s;
+      }
+      .btn-fechar-confirmacao:hover {
+        color: #fff;
+        border-color: #555;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header>
+      <div class="header-top">
+        <img src="img/logo60.png" alt="BURGUERADOS Logo" class="logo" />
+        <button class="cart-btn" data-action="toggle-sidebar">
+          CLIQUE AQUI PARA ABRIR O CARRINHO (<span data-cart-count>0</span>)
+        </button>
+      </div>
+      <div class="search-container">
+        <input
+          type="text"
+          data-search-input
+          placeholder="Clique aqui para buscar no cardápio..."
+          aria-label="Buscar no cardápio"
+        />
+      </div>
+    </header>
+
+    <!-- Carrossel de Categorias -->
+    <nav class="categories-carousel" aria-label="Categorias do cardápio">
+      <div class="categories-container" data-categories-container></div>
+    </nav>
+
+    <!-- Overlay -->
+    <div class="overlay" data-overlay></div>
+
+    <!-- Modal de Boas-vindas -->
+    <div class="welcome-modal" id="welcome-modal">
+      <div class="welcome-modal-content">
+        <div class="welcome-logo">
+          <img src="img/logo800.png" alt="BURGUERADOS Logo" />
+        </div>
+        <h2>Bem-vindo ao BURGUERADOS!</h2>
+        <div class="welcome-text">
+          <p>
+            Faça seu pedido aqui, e ele será enviado
+            <strong>diretamente para nossa loja</strong>.
+          </p>
+          <div class="welcome-features">
+            <div class="feature-item">
+              <span class="feature-icon">🍔</span>
+              <span>Escolha seus produtos</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">🎨</span>
+              <span>Personalize como quiser</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">🛵</span>
+              <span>Entrega ou Retirada</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">📱</span>
+              <span>Peça do conforto de casa</span>
+            </div>
+          </div>
+          <p class="welcome-cta">Bora pedir? 😋</p>
+        </div>
+        <button class="btn-welcome-close" id="btn-welcome-close">
+          CLIQUE AQUI PARA PEDIR!
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal de Personalização -->
+    <div class="modal" data-modal role="dialog" aria-modal="true">
+      <div class="modal-content">
+        <button class="btn-close-modal" data-close-modal aria-label="Fechar">
+          &times;
+        </button>
+        <div class="modal-header">
+          <h3 data-modal-title>Personalizar</h3>
+          <div class="progress-dots" data-progress-dots></div>
+        </div>
+        <div class="step-body" data-modal-body></div>
+        <div class="modal-footer">
+          <button class="btn-back" data-btn-back>Voltar</button>
+          <button class="btn-next" data-btn-next>Próximo</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- MODAL: CAMPO GRANDE -->
+    <!-- ============================================ -->
+    <div class="modal-campo-grande" id="modal-campo-grande">
+      <div class="modal-campo-grande-content">
+        <div class="modal-campo-grande-icon">📍</div>
+        <h3>Taxa de Entrega</h3>
+        <p>
+          Para este bairro, calculamos o valor da entrega com base na distância
+          da loja.
+        </p>
+        <button class="btn-campo-grande-ok" id="btn-campo-grande-ok">
+          Clique aqui para continuar
+        </button>
+      </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- SIDEBAR 1: CARRINHO -->
+    <!-- ============================================ -->
+    <aside class="sidebar" data-sidebar role="complementary">
+      <div class="sidebar-header">
+        <h2>Meu Pedido</h2>
+        <button
+          class="btn-close-sidebar"
+          data-close-sidebar
+          aria-label="Fechar carrinho"
+        >
+          &times;
+        </button>
+      </div>
+
+      <div class="cart-items" data-cart-items></div>
+
+      <div class="cart-footer">
+        <div class="cart-total-bar">
+          <span>Total:</span>
+          <span data-total-cart>R$ 0,00</span>
+        </div>
+        <button class="btn-finalizar-pedido" id="btn-finalizar-pedido">
+          FINALIZAR PEDIDO &#8594;
+        </button>
+      </div>
+    </aside>
+
+    <!-- ============================================ -->
+    <!-- SIDEBAR 2: CHECKOUT -->
+    <!-- ============================================ -->
+    <aside
+      class="sidebar sidebar-checkout"
+      id="sidebar-checkout"
+      role="complementary"
+    >
+      <div class="sidebar-header">
+        <button
+          class="btn-back-to-cart"
+          id="btn-back-to-cart"
+          aria-label="Voltar"
+        >
+          &#8592; Voltar
+        </button>
+        <h2>Finalizar</h2>
+        <button
+          class="btn-close-sidebar"
+          id="btn-close-checkout"
+          aria-label="Fechar"
+        >
+          &times;
+        </button>
+      </div>
+
+      <div class="checkout-scroll">
+        <form class="checkout-form" data-checkout-form>
+          <!-- Tipo de Pedido -->
+          <fieldset>
+            <legend class="form-label">🛵 Tipo de Pedido</legend>
+            <div class="delivery-toggle">
+              <button type="button" data-delivery-type="delivery">
+                Entrega
+              </button>
+              <button type="button" data-delivery-type="pickup" class="active">
+                Retirada
+              </button>
+            </div>
+          </fieldset>
+
+          <!-- Nome -->
+          <input
+            type="text"
+            name="customerName"
+            placeholder="Digite Aqui Seu Nome *"
+            class="form-input"
+            required
+          />
+
+          <div data-delivery-fields style="display: none">
+            <fieldset>
+              <legend class="form-label">📍 Bairro de Entrega</legend>
+              <select
+                name="neighborhood"
+                class="form-input"
+                data-neighborhood-select
+              >
+                <option value="">Selecione o bairro...</option>
+                <option value="agua-fria" data-fee="6">
+                  Água Fria - R$ 6,00
+                </option>
+                <option value="arruda" data-fee="5">Arruda - R$ 5,00</option>
+                <option value="cajueiro" data-fee="6">
+                  Cajueiro - R$ 6,00
+                </option>
+                <option value="campo-grande" data-fee="0">
+                  Campo Grande - Taxa a combinar
+                </option>
+                <option value="campina-barreto" data-fee="4">
+                  Campina do Barreto - R$ 5,00
+                </option>
+                <option value="encruzilhada" data-fee="5">
+                  Encruzilhada - R$ 5,00
+                </option>
+                <option value="hipodromo" data-fee="6">
+                  Hipódromo - R$ 6,00
+                </option>
+                <option value="peixinhos" data-fee="5">
+                  Peixinhos - R$ 5,00
+                </option>
+                <option value="salgadinho" data-fee="5">
+                  Salgadinho - R$ 5,00
+                </option>
+                <option value="sitio-novo" data-fee="3">
+                  Sítio Novo - R$ 3,00
+                </option>
+                <option value="torreao" data-fee="6">Torreão - R$ 6,00</option>
+              </select>
+            </fieldset>
+
+            <input
+              type="text"
+              name="street"
+              placeholder="Endereço (Rua/Av) *"
+              class="form-input"
+              data-delivery-required
+            />
+            <input
+              type="text"
+              name="houseNumber"
+              placeholder="Nº da Casa *"
+              class="form-input"
+              data-delivery-required
+            />
+            <input
+              type="text"
+              name="complement"
+              placeholder="Complemento (Apto, Bloco, etc)"
+              class="form-input"
+            />
+
+            <div
+              class="delivery-fee-display"
+              data-delivery-fee-display
+              style="display: none"
+            >
+              <span>Taxa de Entrega:</span>
+              <span data-delivery-fee-value>R$ 0,00</span>
+            </div>
+          </div>
+
+          <!-- Forma de Pagamento -->
+          <fieldset>
+            <legend class="form-label">💳 Forma de Pagamento</legend>
+            <select name="paymentMethod" class="form-input" required>
+              <option value="">Selecione...</option>
+              <option value="pix">💚 PIX</option>
+              <option value="dinheiro">💵 Dinheiro</option>
+              <option value="debito">💳 Cartão de Débito</option>
+              <option value="credito">💳 Cartão de Crédito</option>
+            </select>
+          </fieldset>
+
+          <!-- Troco -->
+          <div data-change-field style="display: none">
+            <input
+              type="text"
+              name="changeFor"
+              placeholder="Quanto você vai pagar?"
+              class="form-input"
+            />
+          </div>
+
+          <!-- Total -->
+          <div class="total-display">
+            <span>Total:</span>
+            <span data-total-cart>R$ 0,00</span>
+          </div>
+
+          <!-- Botão Finalizar -->
+          <button type="submit" class="btn-checkout">ENVIAR PEDIDO</button>
+        </form>
+      </div>
+    </aside>
+
+    <!-- ============================================ -->
+    <!-- MODAL: CONFIRMAÇÃO DE PEDIDO + WHATSAPP     -->
+    <!-- ============================================ -->
+    <div class="modal-confirmacao" id="modal-confirmacao">
+      <div class="modal-confirmacao-content">
+        <div class="modal-confirmacao-header">
+          <div class="confirmacao-icon">✅</div>
+          <h2>Pedido Pronto!</h2>
+          <p class="confirmacao-subtitle">
+            Revise seu pedido e envie para a loja
+          </p>
+        </div>
+
+        <div class="confirmacao-preview" id="confirmacao-preview">
+          <!-- Preenchido via JS -->
+        </div>
+
+        <div class="confirmacao-actions">
+          <a
+            id="btn-enviar-whatsapp"
+            href="#"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn-whatsapp-confirm"
+          >
+            <span class="whatsapp-icon">📲</span>
+            ENVIAR PEDIDO VIA WHATSAPP
+          </a>
+          <button class="btn-fechar-confirmacao" id="btn-fechar-confirmacao">
+            Fechar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Container do Menu -->
+    <main class="container" data-menu-container></main>
+
+    <!-- ================================================================
+         SCRIPTS - SEM AUTENTICAÇÃO (INDEX/DELIVERY)
+         ================================================================ -->
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <!-- FIX: Auth SDK necessário para autenticação anônima (regras do Firebase exigem auth != null) -->
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+
+    <!-- App Script -->
+    <script src="Delivery.js"></script>
+  </body>
+</html>

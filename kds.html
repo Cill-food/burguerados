@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KDS — Burguerados Paulista</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="kds.css" />
+  </head>
+  <body>
+    <!-- ═══════ HEADER ═══════ -->
+    <header>
+      <div class="header-logo">
+        🍔 KDS
+        <span>Burguerados Paulista</span>
+      </div>
+      <div class="header-center">
+        <span class="online-dot" id="online-dot"></span>
+        <span class="clock" id="clock">00:00:00</span>
+        <span class="badge-count" id="badge-pending">0</span>
+      </div>
+      <div class="header-actions">
+        <button class="btn-new-order" onclick="openNewOrderModal()">
+          ＋ Criar Pedido
+        </button>
+        <button class="btn-loja" id="btn-loja" onclick="toggleLoja()">
+          🟢 Loja Aberta
+        </button>
+        <button
+          class="btn-icon"
+          title="Colapsar menu"
+          onclick="toggleSidebar()"
+        >
+          ☰
+        </button>
+      </div>
+    </header>
+
+    <!-- ═══════ APP BODY ═══════ -->
+    <div class="app-body">
+      <!-- SIDEBAR -->
+      <nav class="sidebar" id="sidebar">
+        <div class="sidebar-nav">
+          <div class="sidebar-section-title">Operações</div>
+          <div
+            class="nav-item active"
+            data-view="kds"
+            onclick="switchView('kds')"
+          >
+            <span class="nav-icon">📋</span>
+            <span class="nav-label">Pedidos ao vivo</span>
+          </div>
+          <div class="sidebar-divider"></div>
+          <div class="sidebar-section-title">Gestão</div>
+          <div
+            class="nav-item"
+            data-view="history"
+            onclick="switchView('history')"
+          >
+            <span class="nav-icon">📜</span>
+            <span class="nav-label">Histórico de pedidos</span>
+          </div>
+          <div
+            class="nav-item"
+            data-view="cardapio"
+            onclick="switchView('cardapio')"
+          >
+            <span class="nav-icon">📝</span>
+            <span class="nav-label">Gestão de cardápio</span>
+          </div>
+        </div>
+      </nav>
+
+      <!-- MAIN CONTENT -->
+      <div class="main-content">
+        <!-- ── KDS VIEW ── -->
+        <div class="view active" id="view-kds">
+          <div class="kds-toolbar">
+            <div class="filter-tabs">
+              <button
+                class="filter-tab active"
+                onclick="setFilter('all', this)"
+              >
+                Todos
+              </button>
+              <button class="filter-tab" onclick="setFilter('pending', this)">
+                ⏳ Aguardando
+              </button>
+              <button class="filter-tab" onclick="setFilter('accepted', this)">
+                ✅ Em preparo
+              </button>
+              <!-- Concluídos são movidos ao histórico — use a aba Histórico para consultá-los -->
+            </div>
+            <div class="kds-stats">
+              <div class="kds-stat">
+                <div
+                  class="kds-stat-val"
+                  id="stat-pending"
+                  style="color: var(--yellow)"
+                >
+                  0
+                </div>
+                <div class="kds-stat-lbl">Aguardando</div>
+              </div>
+              <div class="kds-stat">
+                <div
+                  class="kds-stat-val"
+                  id="stat-accepted"
+                  style="color: var(--green)"
+                >
+                  0
+                </div>
+                <div class="kds-stat-lbl">Em preparo</div>
+              </div>
+              <div class="kds-stat">
+                <div
+                  class="kds-stat-val"
+                  id="stat-done"
+                  style="color: var(--text-muted)"
+                >
+                  0
+                </div>
+                <div class="kds-stat-lbl">Hoje concluídos</div>
+              </div>
+              <div class="kds-stat">
+                <div
+                  class="kds-stat-val"
+                  id="stat-avg-time"
+                  style="color: var(--blue)"
+                >
+                  —
+                </div>
+                <div class="kds-stat-lbl">Tempo médio</div>
+              </div>
+            </div>
+          </div>
+          <div class="kds-grid" id="kds-grid">
+            <div class="empty-state">
+              <div class="empty-state-icon">🍽️</div>
+              <div class="empty-state-text">Nenhum pedido no momento</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── HISTORY VIEW ── -->
+        <div class="view" id="view-history">
+          <div class="history-toolbar">
+            <div class="history-filters">
+              <div class="filter-group">
+                <span class="filter-label">Data início</span>
+                <input type="date" class="form-input" id="hist-date-start" />
+              </div>
+              <div class="filter-group">
+                <span class="filter-label">Data fim</span>
+                <input type="date" class="form-input" id="hist-date-end" />
+              </div>
+              <div class="filter-group">
+                <span class="filter-label">Status</span>
+                <select class="form-input" id="hist-status-filter">
+                  <option value="all">Todos</option>
+                  <option value="done">Concluído</option>
+                  <option value="refused">Recusado</option>
+                  <option value="cancelled">Cancelado</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <span class="filter-label">Tipo</span>
+                <select class="form-input" id="hist-type-filter">
+                  <option value="all">Todos</option>
+                  <option value="delivery">Delivery</option>
+                  <option value="pickup">Retirada</option>
+                  <option value="mesa">Mesa</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <span class="filter-label">&nbsp;</span>
+                <button class="btn-filter" onclick="applyHistoryFilter()">
+                  Filtrar
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="history-summary">
+            <div class="hist-stat">
+              <div class="hist-stat-val" id="hs-total">0</div>
+              <div class="hist-stat-lbl">Pedidos</div>
+            </div>
+            <div class="hist-stat">
+              <div class="hist-stat-val" id="hs-revenue">R$ 0</div>
+              <div class="hist-stat-lbl">Faturamento</div>
+            </div>
+            <div class="hist-stat">
+              <div class="hist-stat-val" id="hs-avg">R$ 0</div>
+              <div class="hist-stat-lbl">Ticket médio</div>
+            </div>
+            <div class="hist-stat">
+              <div class="hist-stat-val" id="hs-refused">0</div>
+              <div class="hist-stat-lbl">Recusados</div>
+            </div>
+          </div>
+          <div class="history-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Hora</th>
+                  <th>Cliente</th>
+                  <th>Tipo</th>
+                  <th>Itens</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="history-tbody">
+                <tr>
+                  <td
+                    colspan="7"
+                    style="
+                      text-align: center;
+                      color: var(--text-muted);
+                      padding: 30px;
+                    "
+                  >
+                    Nenhum pedido no histórico.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ── CARDÁPIO VIEW ── -->
+        <div class="view" id="view-cardapio">
+          <div class="cardapio-toolbar">
+            <div class="cardapio-title">Gestão de Cardápio</div>
+            <div class="cardapio-search">
+              <input
+                type="text"
+                class="form-input"
+                id="cardapio-search"
+                placeholder="Buscar item..."
+                oninput="filterCardapio(this.value)"
+                style="width: 220px"
+              />
+            </div>
+          </div>
+          <div class="cardapio-content" id="cardapio-content">
+            <p
+              style="
+                color: var(--text-muted);
+                text-align: center;
+                margin-top: 40px;
+              "
+            >
+              Carregando cardápio...
+            </p>
+          </div>
+        </div>
+      </div>
+      <!-- /main-content -->
+    </div>
+    <!-- /app-body -->
+
+    <!-- ═══════ MODAL: NOVO PEDIDO ═══════ -->
+    <div class="modal-overlay" id="modal-new-order">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h2>Novo Pedido</h2>
+          <button class="modal-close" onclick="closeNewOrderModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-col">
+              <label>NOME DO CLIENTE</label>
+              <input
+                class="form-input-full"
+                id="new-customer"
+                placeholder="Ex: João Silva"
+              />
+            </div>
+            <div class="form-col">
+              <label>TIPO</label>
+              <select class="form-input-full" id="new-type">
+                <option value="pickup">Retirada</option>
+                <option value="delivery">Delivery</option>
+                <option value="mesa">Mesa</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row" id="new-address-row" style="display: none">
+            <div class="form-col full">
+              <label>ENDEREÇO</label>
+              <input
+                class="form-input-full"
+                id="new-address"
+                placeholder="Rua, número, bairro"
+              />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-col">
+              <label>PAGAMENTO</label>
+              <select class="form-input-full" id="new-payment">
+                <option value="Dinheiro">Dinheiro</option>
+                <option value="Pix">Pix</option>
+                <option value="Cartão Crédito">Cartão Crédito</option>
+                <option value="Cartão Débito">Cartão Débito</option>
+              </select>
+            </div>
+            <div class="form-col">
+              <label>TAXA DE ENTREGA</label>
+              <input
+                class="form-input-full"
+                id="new-fee"
+                type="number"
+                min="0"
+                step="0.5"
+                value="0"
+                placeholder="0.00"
+              />
+            </div>
+          </div>
+          <div style="margin-top: 12px">
+            <label>ITENS DO PEDIDO</label>
+            <div class="modal-items-list" id="modal-items-list"></div>
+            <button class="btn-add-item" onclick="addItemRow()">
+              + Adicionar item
+            </button>
+          </div>
+          <div class="form-row" style="margin-top: 12px">
+            <div class="form-col full">
+              <label>OBSERVAÇÕES GERAIS</label>
+              <textarea
+                class="form-input-full"
+                id="new-obs"
+                placeholder="Ex: sem cebola no burguer 1..."
+              ></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-modal-cancel" onclick="closeNewOrderModal()">
+            Cancelar
+          </button>
+          <button class="btn-modal-save" onclick="saveManualOrder()">
+            Criar Pedido
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ MODAL: CONFIRMAÇÃO ═══════ -->
+    <div class="confirm-modal-overlay" id="confirm-modal">
+      <div class="confirm-box">
+        <div class="confirm-icon" id="confirm-icon">⚠️</div>
+        <div class="confirm-title" id="confirm-title">Confirmar ação</div>
+        <div class="confirm-msg" id="confirm-msg">Tem certeza?</div>
+        <div class="confirm-actions">
+          <button class="btn-modal-cancel" onclick="closeConfirm()">
+            Cancelar
+          </button>
+          <button
+            class="btn-modal-save"
+            id="confirm-ok"
+            onclick="confirmAction()"
+          >
+            Confirmar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ÁREA DE IMPRESSÃO -->
+    <div id="print-area"></div>
+
+    <!-- TOAST -->
+    <div id="toast-container"></div>
+
+    <!-- FIREBASE SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+
+    <!-- KDS Script -->
+    <script src="kds.js"></script>
+  </body>
+</html>

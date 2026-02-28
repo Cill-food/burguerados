@@ -1,0 +1,189 @@
+{
+  "Hambúrgueres Artesanais": [
+    {
+      "nome": "Burguerado Clássico",
+      "opcoes": ["Individual"],
+      "descricao": "Pão brioche, carne bovina 105g, cebola caramelizada, cheddar e molho especial.",
+      "precoBase": [10],
+      "img": "img/burguerado-classico.png"
+    },
+    {
+      "nome": "Burguerado Duplo",
+      "opcoes": ["Individual"],
+      "descricao": "Pão brioche, 2 carnes bovina 105g, cebola caramelizada, cheddar e molho especial.",
+      "precoBase": [15],
+      "img": "img/burguerado-duplo.png"
+    },
+    {
+      "nome": "Burguerado Supremo",
+      "opcoes": ["Individual"],
+      "descricao": "Pão brioche, 3 carnes bovina 105g, cebola caramelizada, bacon crocante, cheddar e molho especial.",
+      "precoBase": [25],
+      "img": "img/burguerado-supremo.png"
+    },
+    {
+      "nome": "Burguerado Quarteirão",
+      "opcoes": ["Individual"],
+      "descricao": "Pão brioche, 4 carnes bovina 105g, cebola caramelizada, bacon crocante, cheddar e molho especial.",
+      "precoBase": [34],
+      "img": "img/burguerado-quarteirao.png"
+    }
+  ],
+  "Edição Burguerados": [
+    {
+      "nome": "Burguerado Costela BBQ",
+      "opcoes": ["Individual"],
+      "descricao": "Pão brioche, carne de costela bovina 150g, cheddar, bacon, cebola caramelizada e molho barbecue especial.",
+      "precoBase": [20],
+      "img": "img/burguerado-costela-bbq.png"
+    },
+    {
+      "nome": "Burguerado Duplo bacon",
+      "opcoes": ["Individual"],
+      "descricao": "Pão brioche, 2 carnes bovina 120g, cheddar, duplo bacon crocante, cebola caramelizada e molho especial.",
+      "precoBase": [30],
+      "img": "img/burguerado-duplo-bacon.png"
+    },
+    {
+      "nome": "Burguerado Creamcheese",
+      "opcoes": ["Individual"],
+      "descricao": "Pão brioche, carne bovina 120g, creamcheese, cheddar, cebola caramelizada e barbecue.",
+      "precoBase": [17],
+      "img": "img/burguerado-creamcheese.png"
+    },
+    {
+      "nome": "Burguerado Eggy",
+      "opcoes": ["Individual"],
+      "descricao": "Pão brioche, carne bovina 105g, cebola caramelizada, cheddar, ovo frito, bacon crocante e molho especial.",
+      "precoBase": [18],
+      "img": "img/burguerado-eggy.png"
+    }
+  ],
+  "Irados com Salada": [
+    {
+      "nome": "Burguerado Salada",
+      "opcoes": ["Individual"],
+      "descricao": "Pão brioche, carne bovina 100g, cebola caramelizada, cheddar, tomate, alface e molho especial.",
+      "precoBase": [16],
+      "img": "img/burguerado-salada.png"
+    },
+    {
+      "nome": "Burguerado Kids",
+      "opcoes": ["Individual"],
+      "descricao": "Pão brioche, carne bovina 80g, cheddar, alface, tomate e molho especial.",
+      "precoBase": [9],
+      "img": "img/burguerado-kids.png"
+    }
+  ],
+  "Burguerados Tradicionais": [
+    {
+      "nome": "X-Bacon Tradicional",
+      "opcoes": ["Individual"],
+      "descricao": "Pão brioche, carne industrial, cheddar, alface, tomate, cebola caramelizada, bacon crocante e molho especial.",
+      "precoBase": [14],
+      "img": "img/x-bacon-tradicional.png"
+    },
+    {
+      "nome": "X-Eggy Tradicional",
+      "opcoes": ["Individual"],
+      "descricao": "Pão brioche, carne industrial, cheddar, alface, tomate, cebola caramelizada e molho especial.",
+      "precoBase": [14],
+      "img": "img/x-eggy-tradicional.png"
+    },
+    {
+      "nome": "Duplo Tradicional",
+      "opcoes": ["Individual"],
+      "descricao": "Pão brioche, 2 carnes industriais, cheddar, cebola caramelizada e molho especial.",
+      "precoBase": [12],
+      "img": "img/duplo-tradicional.png"
+    },
+    {
+      "nome": "Supremo Tradicional",
+      "opcoes": ["Individual"],
+      "descricao": "Pão brioche, 3 carnes industriais, cheddar, cebola caramelizada, bacon crocante e molho especial.",
+      "precoBase": [17],
+      "img": "img/supremo-tradicional.png"
+    }
+  ],
+  "Fritas Iradas": [
+    {
+      "nome": "Fritas Iradas P",
+      "opcoes": ["Pequena"],
+      "descricao": "Porção de fritas pequena.",
+      "precoBase": [7],
+      "img": "img/fritas-p.png"
+    },
+    {
+      "nome": "Fritas Iradas M",
+      "opcoes": ["Média"],
+      "descricao": "Porção de fritas média acompanhadas com cheddar derretido.",
+      "precoBase": [11],
+      "img": "img/fritas-m.png"
+    },
+    {
+      "nome": "Fritas Iradas G",
+      "opcoes": ["Grande"],
+      "descricao": "Porção de fritas grande acompanhadas com cheddar derretido e bacon frito em cubos.",
+      "precoBase": [18],
+      "img": "img/fritas-g.png"
+    }
+  ],
+  "Acompanhamentos e Bebidas": [
+    {
+      "nome": "Refrigerantes Lata",
+      "opcoes": [
+        "Guaraná",
+        "Guaraná Zero",
+        "Coca-Cola",
+        "Coca-Cola Zero",
+        "Lemoneto"
+      ],
+      "precoBase": [6, 6, 7, 7, 7],
+      "img": "img/bebidas-lata.png"
+    },
+    {
+      "nome": "Refrigerantes 1L",
+      "opcoes": ["Guaraná", "Guaraná Zero", "Sukita", "Pepsi", "Pepsi Zero"],
+      "precoBase": [8, 8, 8, 9.9, 9.9],
+      "img": "img/bebidas-1l.png"
+    },
+    {
+      "nome": "Adicionais",
+      "opcoes": ["Potinho de molho da casa"],
+      "precoBase": [2.5],
+      "img": "img/molho-casa.png"
+    }
+  ],
+  "Milkshakes Irado": [
+    {
+      "nome": "Milkshake Irado Morango",
+      "opcoes": ["500ml"],
+      "descricao": "Massa de milkshake de morango com calda de chocolate ou morango.",
+      "precoBase": [14],
+      "img": "img/milkshake-morango.png"
+    },
+    {
+      "nome": "Milkshake Irado Baunilha",
+      "opcoes": ["500ml"],
+      "descricao": "Massa de milkshake de baunilha com calda de chocolate ou morango.",
+      "precoBase": [14],
+      "img": "img/milkshake-baunilha.png"
+    },
+    {
+      "nome": "Milkshake Irado OvoMaltine",
+      "opcoes": ["500ml"],
+      "descricao": "Massa de milkshake de baunilha, ovomaltine, calda de chocolate ou morango.",
+      "precoBase": [16],
+      "img": "img/milkshake-ovomaltine.png"
+    }
+  ],
+  "Potinho da Felicidade": [
+    {
+      "nome": "Docinhos da felicidade",
+      "opcoes": ["4 unidades"],
+      "descricao": "Quatro brigadeiros sortidos.",
+      "precoBase": [5],
+      "img": "img/docinhos.png"
+    }
+  ]
+}
