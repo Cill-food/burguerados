@@ -3,28 +3,35 @@
     {
       "nome": "Burguerado Clássico",
       "opcoes": ["Individual"],
-      "descricao": "Pão brioche, carne bovina 105g, cebola caramelizada, cheddar e molho especial.",
+      "descricao": "Pão brioche levemente selado, blend de carne (105g), queijo cheddar, cebola caramelizada e nossa irresistível maionese caseira.",
       "precoBase": [10],
       "img": "img/burguerado-classico.png"
     },
     {
+      "nome": "Burguerado Cheese",
+      "opcoes": ["Individual"],
+      "descricao": "Pão brioche levemente selado, blend de carne (105g), molho cheddar cremoso, cebola caramelizada e maionese caseira.",
+      "precoBase": [13],
+      "img": "img/burguerado-cheese.png"
+    },
+    {
       "nome": "Burguerado Duplo",
       "opcoes": ["Individual"],
-      "descricao": "Pão brioche, 2 carnes bovina 105g, cebola caramelizada, cheddar e molho especial.",
+      "descricao": "Pão brioche levemente selado, 02 blends de carne (105g cada), queijo cheddar Original, cebola caramelizada e maionese caseira.",
       "precoBase": [15],
       "img": "img/burguerado-duplo.png"
     },
     {
       "nome": "Burguerado Supremo",
       "opcoes": ["Individual"],
-      "descricao": "Pão brioche, 3 carnes bovina 105g, cebola caramelizada, bacon crocante, cheddar e molho especial.",
+      "descricao": "Pão brioche levemente selado, 03 blends de carne (105g cada), queijo cheddar, bacon crocante, cebola caramelizada e maionese caseira.",
       "precoBase": [25],
       "img": "img/burguerado-supremo.png"
     },
     {
       "nome": "Burguerado Quarteirão",
       "opcoes": ["Individual"],
-      "descricao": "Pão brioche, 4 carnes bovina 105g, cebola caramelizada, bacon crocante, cheddar e molho especial.",
+      "descricao": "Pão brioche selado na chapa, 04 blends de carne (105g cada), queijo cheddar Original, bacon crocante, cebola caramelizada e maionese caseira.",
       "precoBase": [34],
       "img": "img/burguerado-quarteirao.png"
     }
@@ -33,28 +40,28 @@
     {
       "nome": "Burguerado Costela BBQ",
       "opcoes": ["Individual"],
-      "descricao": "Pão brioche, carne de costela bovina 150g, cheddar, bacon, cebola caramelizada e molho barbecue especial.",
+      "descricao": "Pão brioche selado, blend suculento de costela 100% bovina (150g), queijo cheddar, bacon crocante, cebola caramelizada e molho especial barbecue.",
       "precoBase": [20],
       "img": "img/burguerado-costela-bbq.png"
     },
     {
       "nome": "Burguerado Duplo bacon",
       "opcoes": ["Individual"],
-      "descricao": "Pão brioche, 2 carnes bovina 120g, cheddar, duplo bacon crocante, cebola caramelizada e molho especial.",
+      "descricao": "Pão brioche macio, blend de carne (105g), queijo cheddar, MUITO bacon crocante e maionese caseira.",
       "precoBase": [30],
       "img": "img/burguerado-duplo-bacon.png"
     },
     {
       "nome": "Burguerado Creamcheese",
       "opcoes": ["Individual"],
-      "descricao": "Pão brioche, carne bovina 120g, creamcheese, cheddar, cebola caramelizada e barbecue.",
+      "descricao": "Pão brioche artesanal, blend de carne (120g), queijo cheddar, cream cheese, cebola caramelizada e sua escolha entre maionese da casa ou molho barbecue.",
       "precoBase": [17],
       "img": "img/burguerado-creamcheese.png"
     },
     {
       "nome": "Burguerado Eggy",
       "opcoes": ["Individual"],
-      "descricao": "Pão brioche, carne bovina 105g, cebola caramelizada, cheddar, ovo frito, bacon crocante e molho especial.",
+      "descricao": "Pão brioche levemente selado, blend de carne (120g), queijo cheddar, ovo frito, bacon crocante, cebola caramelizada e maionese caseira.",
       "precoBase": [18],
       "img": "img/burguerado-eggy.png"
     }
