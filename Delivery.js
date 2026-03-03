@@ -30,7 +30,7 @@ const WelcomeModal = {
 // CONFIGURAÇÃO
 // ================================
 const CONFIG = {
-  whatsappNumber: "5581996469626",
+  whatsappNumber: "5581984752434",
   menuDataUrl: "cardapio.json",
   firebaseConfig: {
     apiKey: "AIzaSyD3A4S7qaX-d6XjuGNRJ_GJZCPSED4Avis",
@@ -2113,3 +2113,4 @@ if (document.readyState === "loading") {
 } else {
   App.init();
 }
+
