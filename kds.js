@@ -200,6 +200,7 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") {
     closeNewOrderModal();
     closeConfirm();
+    closeEditModal();
   }
   // A = aceitar o pedido pendente mais antigo
   if (e.key === "a" || e.key === "A") {
@@ -688,10 +689,40 @@ function renderHistoryTable(list) {
 // GESTÃO DE CARDÁPIO
 // ═══════════════════════════════════════════
 async function loadCardapio() {
+  // Try Firebase first, then fallback to JSON
+  if (db) {
+    try {
+      const snap = await db.ref("cardapio").once("value");
+      if (snap.val()) {
+        cardapioRaw = snap.val();
+        renderCardapio(cardapioRaw);
+        // Listen for realtime updates
+        db.ref("cardapio").on("value", (s) => {
+          if (s.val()) {
+            cardapioRaw = s.val();
+            renderCardapio(cardapioRaw);
+          }
+        });
+        return;
+      }
+    } catch (e) {
+      /* fallthrough to JSON */
+    }
+  }
   try {
     const res = await fetch("cardapio.json");
     cardapioRaw = await res.json();
     renderCardapio(cardapioRaw);
+    // If we have db now, seed it and listen
+    if (db) {
+      await db.ref("cardapio").set(cardapioRaw);
+      db.ref("cardapio").on("value", (s) => {
+        if (s.val()) {
+          cardapioRaw = s.val();
+          renderCardapio(cardapioRaw);
+        }
+      });
+    }
   } catch (e) {
     document.getElementById("cardapio-content").innerHTML =
       `<p style="color:var(--red);text-align:center;margin-top:40px">⚠️ Não foi possível carregar o cardápio.</p>`;
@@ -730,17 +761,38 @@ function renderCardapio(data, search = "") {
       const price = Array.isArray(item.precoBase)
         ? item.precoBase[0]
         : item.precoBase;
+      const discount = item.desconto || null;
+
+      let priceHtml = "";
+      if (discount) {
+        const discVal =
+          discount.tipo === "porcentagem"
+            ? price * (1 - discount.valor / 100)
+            : price - discount.valor;
+        const discFinal = Math.max(0, discVal);
+        priceHtml = `<div class="item-price-menu">
+          <span class="price-original">${formatPrice(price)}</span>
+          <span class="price-discount">${formatPrice(discFinal)}</span>
+          <span class="discount-badge">${discount.tipo === "porcentagem" ? `-${discount.valor}%` : `-R$${discount.valor.toFixed(2).replace(".", ",")}`}</span>
+        </div>`;
+      } else {
+        priceHtml = `<div class="item-price-menu">${formatPrice(price)}</div>`;
+      }
+
       html += `
         <div class="menu-item-card ${available ? "" : "unavailable"}">
           <div class="item-info-menu">
             <div class="item-name-menu">${item.nome}</div>
-            <div class="item-price-menu">${formatPrice(price)}</div>
+            ${priceHtml}
             ${item.descricao ? `<div class="item-desc-menu">${item.descricao}</div>` : ""}
           </div>
-          <label class="toggle-switch">
-            <input type="checkbox" ${available ? "checked" : ""} onchange="toggleMenuItem('${key}', this.checked)">
-            <span class="toggle-slider"></span>
-          </label>
+          <div class="item-card-actions">
+            <label class="toggle-switch">
+              <input type="checkbox" ${available ? "checked" : ""} onchange="toggleMenuItem('${key}', this.checked)">
+              <span class="toggle-slider"></span>
+            </label>
+            <button class="btn-edit-item" onclick="openEditModal('${encodeURIComponent(cat)}','${encodeURIComponent(item.nome)}')">✏️ Editar</button>
+          </div>
         </div>`;
     });
     html += "</div></div>";
@@ -770,6 +822,180 @@ function toggleMenuItem(key, available) {
     .catch((err) => {
       showToast("❌ Erro: " + err.message, "error");
     });
+}
+
+// ─── EDIÇÃO DE ITEM DO CARDÁPIO ───────────────────────────────────────
+let editTarget = null;
+
+function openEditModal(catEnc, nomeEnc) {
+  const cat = decodeURIComponent(catEnc);
+  const nome = decodeURIComponent(nomeEnc);
+  if (!cardapioRaw || !cardapioRaw[cat]) return;
+
+  const idx = cardapioRaw[cat].findIndex((i) => i.nome === nome);
+  if (idx < 0) return;
+  const item = cardapioRaw[cat][idx];
+  editTarget = { cat, idx };
+
+  document.getElementById("edit-item-nome").value = item.nome || "";
+  document.getElementById("edit-item-desc").value = item.descricao || "";
+
+  const pricesWrap = document.getElementById("edit-prices-list");
+  pricesWrap.innerHTML = "";
+  const precos = Array.isArray(item.precoBase)
+    ? item.precoBase
+    : [item.precoBase];
+  const opcoes = item.opcoes || ["Individual"];
+  precos.forEach((p, i) => {
+    pricesWrap.appendChild(buildOpcaoRow(opcoes[i] || "", p));
+  });
+
+  const discount = item.desconto || null;
+  document.getElementById("edit-discount-active").checked = !!discount;
+  document.getElementById("edit-discount-fields").style.display = discount
+    ? "flex"
+    : "none";
+  if (discount) {
+    document.getElementById("edit-discount-tipo").value =
+      discount.tipo || "porcentagem";
+    document.getElementById("edit-discount-valor").value = discount.valor || "";
+  } else {
+    document.getElementById("edit-discount-tipo").value = "porcentagem";
+    document.getElementById("edit-discount-valor").value = "";
+  }
+
+  document.getElementById("modal-edit-item").classList.add("active");
+}
+
+function closeEditModal() {
+  document.getElementById("modal-edit-item").classList.remove("active");
+  editTarget = null;
+}
+
+function buildOpcaoRow(opcaoNome, preco) {
+  const row = document.createElement("div");
+  row.className = "edit-price-row";
+  row.innerHTML = `
+    <input type="text" class="form-input edit-opcao-nome" placeholder="Nome da opção" value="${opcaoNome}">
+    <input type="number" class="form-input edit-price-input" min="0" step="0.5" placeholder="0,00" value="${preco}">
+    <button type="button" class="btn-remove-opcao" onclick="removeOpcaoRow(this)" title="Remover opção">✕</button>`;
+  return row;
+}
+
+function addOpcaoRow() {
+  document
+    .getElementById("edit-prices-list")
+    .appendChild(buildOpcaoRow("", ""));
+  updateDiscountLabel();
+}
+
+function removeOpcaoRow(btn) {
+  const list = document.getElementById("edit-prices-list");
+  if (list.children.length <= 1) {
+    showToast("O item precisa ter ao menos uma opção", "error");
+    return;
+  }
+  btn.closest(".edit-price-row").remove();
+  updateDiscountLabel();
+}
+
+function saveEditItem() {
+  if (!editTarget || !cardapioRaw) return;
+  const { cat, idx } = editTarget;
+  const item = { ...cardapioRaw[cat][idx] };
+
+  const novoNome = document.getElementById("edit-item-nome").value.trim();
+  const novaDesc = document.getElementById("edit-item-desc").value.trim();
+
+  if (!novoNome) {
+    showToast("Nome não pode ser vazio", "error");
+    return;
+  }
+
+  const priceRows = document.querySelectorAll(
+    "#edit-prices-list .edit-price-row",
+  );
+  if (priceRows.length === 0) {
+    showToast("Adicione ao menos uma opção", "error");
+    return;
+  }
+
+  const novasOpcoes = [];
+  const novosPrecos = [];
+  let opcaoInvalida = false;
+  priceRows.forEach((row) => {
+    const opcaoNome = row.querySelector(".edit-opcao-nome").value.trim();
+    const preco = parseFloat(row.querySelector(".edit-price-input").value);
+    if (!opcaoNome) {
+      opcaoInvalida = true;
+      return;
+    }
+    novasOpcoes.push(opcaoNome);
+    novosPrecos.push(isNaN(preco) ? 0 : preco);
+  });
+  if (opcaoInvalida) {
+    showToast("Preencha o nome de todas as opções", "error");
+    return;
+  }
+
+  const discountActive = document.getElementById(
+    "edit-discount-active",
+  ).checked;
+  let desconto = null;
+  if (discountActive) {
+    const tipo = document.getElementById("edit-discount-tipo").value;
+    const valor = parseFloat(
+      document.getElementById("edit-discount-valor").value,
+    );
+    if (!valor || valor <= 0) {
+      showToast("Informe o valor do desconto", "error");
+      return;
+    }
+    desconto = { tipo, valor };
+  }
+
+  const oldNome = item.nome;
+  const oldKey = `${cat}:${oldNome}`;
+  const newKey = `${cat}:${novoNome}`;
+
+  cardapioRaw[cat][idx] = {
+    ...item,
+    nome: novoNome,
+    descricao: novaDesc,
+    opcoes: novasOpcoes,
+    precoBase: novosPrecos,
+    desconto: desconto,
+  };
+
+  if (!db) {
+    showToast("Firebase não conectado", "error");
+    return;
+  }
+
+  const updates = {};
+  // Save the full cardapio object (category names are the keys)
+  updates["cardapio"] = cardapioRaw;
+
+  if (novoNome !== oldNome) {
+    const wasAvail = menuAvailability[oldKey];
+    if (wasAvail !== undefined) {
+      updates[`menuAvailability/${newKey}`] = wasAvail;
+      updates[`menuAvailability/${oldKey}`] = null;
+    }
+  }
+
+  db.ref()
+    .update(updates)
+    .then(() => {
+      showToast("✅ Item atualizado!", "success");
+      closeEditModal();
+    })
+    .catch((err) => showToast("❌ Erro: " + err.message, "error"));
+}
+
+// Firebase keys cannot contain . # $ [ ] / — encode category names
+function encodeCardapioKey(cat) {
+  return cat.replace(/[.#$[\]/]/g, "_");
 }
 
 // ═══════════════════════════════════════════
@@ -957,6 +1183,33 @@ function setDefaultDates() {
   const fmt = (d) => d.toISOString().slice(0, 10);
   document.getElementById("hist-date-start").value = fmt(prior);
   document.getElementById("hist-date-end").value = fmt(today);
+}
+
+function updateDiscountLabel() {
+  const tipo = document.getElementById("edit-discount-tipo");
+  const valorEl = document.getElementById("edit-discount-valor");
+  const preview = document.getElementById("edit-discount-preview");
+  if (!tipo || !valorEl) return;
+
+  document.getElementById("edit-discount-valor-label").textContent =
+    tipo.value === "porcentagem" ? "VALOR (%)" : "VALOR (R$)";
+
+  const valor = parseFloat(valorEl.value);
+  if (!valor || !preview) {
+    if (preview) preview.textContent = "";
+    return;
+  }
+
+  const firstPrice = document.querySelector(
+    "#edit-prices-list .edit-price-input",
+  );
+  if (!firstPrice) return;
+  const preco = parseFloat(firstPrice.value) || 0;
+
+  const final =
+    tipo.value === "porcentagem" ? preco * (1 - valor / 100) : preco - valor;
+
+  preview.innerHTML = `Preço base: <b>${formatPrice(preco)}</b> → Com desconto: <b style="color:var(--green)">${formatPrice(Math.max(0, final))}</b>`;
 }
 
 // ═══════════════════════════════════════════

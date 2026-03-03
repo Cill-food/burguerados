@@ -373,7 +373,174 @@
       </div>
     </div>
 
+    <!-- ═══════ MODAL: EDITAR ITEM DO CARDÁPIO ═══════ -->
+    <div class="modal-overlay" id="modal-edit-item">
+      <div class="modal-box modal-box-sm">
+        <div class="modal-header">
+          <h2>✏️ Editar Item</h2>
+          <button class="modal-close" onclick="closeEditModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-col full">
+              <label>NOME DO ITEM</label>
+              <input
+                class="form-input-full"
+                id="edit-item-nome"
+                placeholder="Nome do item"
+              />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-col full">
+              <label>DESCRIÇÃO</label>
+              <textarea
+                class="form-input-full"
+                id="edit-item-desc"
+                rows="3"
+                placeholder="Descrição do item..."
+              ></textarea>
+            </div>
+          </div>
+          <div style="margin-top: 12px">
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 8px;
+              "
+            >
+              <label style="margin: 0">OPÇÕES E PREÇOS</label>
+              <button
+                type="button"
+                class="btn-add-opcao"
+                onclick="addOpcaoRow()"
+              >
+                ＋ Opção
+              </button>
+            </div>
+            <div
+              style="
+                display: grid;
+                grid-template-columns: 1fr 110px 30px;
+                gap: 8px;
+                align-items: center;
+                margin-bottom: 4px;
+                padding: 0 2px;
+              "
+            >
+              <span
+                style="
+                  font-size: 11px;
+                  color: var(--text-muted);
+                  font-weight: 600;
+                "
+                >NOME DA OPÇÃO</span
+              >
+              <span
+                style="
+                  font-size: 11px;
+                  color: var(--text-muted);
+                  font-weight: 600;
+                  text-align: right;
+                "
+                >PREÇO (R$)</span
+              >
+              <span></span>
+            </div>
+            <div
+              id="edit-prices-list"
+              style="display: flex; flex-direction: column; gap: 6px"
+            ></div>
+          </div>
+          <div
+            style="
+              margin-top: 16px;
+              padding-top: 14px;
+              border-top: 1px solid var(--border);
+            "
+          >
+            <label
+              style="
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                cursor: pointer;
+                margin-bottom: 12px;
+              "
+            >
+              <input
+                type="checkbox"
+                id="edit-discount-active"
+                onchange="
+                  document.getElementById(
+                    'edit-discount-fields',
+                  ).style.display = this.checked ? 'flex' : 'none'
+                "
+              />
+              <span
+                style="font-size: 13px; font-weight: 600; color: var(--orange)"
+                >🏷️ Aplicar Desconto</span
+              >
+            </label>
+            <div
+              id="edit-discount-fields"
+              style="
+                display: none;
+                gap: 12px;
+                align-items: flex-end;
+                flex-wrap: wrap;
+              "
+            >
+              <div style="flex: 1; min-width: 140px">
+                <label>TIPO DE DESCONTO</label>
+                <select
+                  class="form-input-full"
+                  id="edit-discount-tipo"
+                  onchange="updateDiscountLabel()"
+                >
+                  <option value="porcentagem">Porcentagem (%)</option>
+                  <option value="valor">Valor fixo (R$)</option>
+                </select>
+              </div>
+              <div style="flex: 1; min-width: 120px">
+                <label id="edit-discount-valor-label">VALOR (%)</label>
+                <input
+                  type="number"
+                  class="form-input-full"
+                  id="edit-discount-valor"
+                  min="0"
+                  step="0.5"
+                  placeholder="Ex: 10"
+                  oninput="updateDiscountLabel()"
+                />
+              </div>
+              <div
+                id="edit-discount-preview"
+                style="
+                  width: 100%;
+                  margin-top: 4px;
+                  font-size: 12px;
+                  color: var(--text-muted);
+                "
+              ></div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-modal-cancel" onclick="closeEditModal()">
+            Cancelar
+          </button>
+          <button class="btn-modal-save" onclick="saveEditItem()">
+            💾 Salvar
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- ÁREA DE IMPRESSÃO -->
+
     <div id="print-area"></div>
 
     <!-- TOAST -->
